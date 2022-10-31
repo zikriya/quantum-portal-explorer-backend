@@ -36,6 +36,7 @@ var schema = mongoose.Schema({
   },
   destinationTransactionInfo: {
     transactionHash: { type: String, default: "" },
+    address: { type: String, default: "" },
     network: { type: mongoose.Schema.Types.ObjectId, ref: 'networks' },
     status: { type: String, default: "" },
     timestamp: { type: Number, default: null },

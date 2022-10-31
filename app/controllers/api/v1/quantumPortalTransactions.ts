@@ -4,6 +4,21 @@ module.exports = function (router: any) {
 
     var filter: any = {};
 
+    if(req.query.sourceAddress && req.query.destinationAddress){
+      filter.$or = [
+        { 'sourceTransactionInfo.address': { $eq:(req.query.sourceAddress).toLowerCase() } },
+        { 'destinationTransactionInfo.address': { $eq:(req.query.destinationAddress).toLowerCase() } }
+      ]
+    }else if(req.query.sourceAddress){
+      filter.$and = [
+        {'sourceTransactionInfo.address': { $eq:(req.query.sourceAddress).toLowerCase() } }
+      ]
+    }else if(req.query.destinationAddress){
+      filter.$and = [
+        {'destinationTransactionInfo.address': { $eq:(req.query.destinationAddress).toLowerCase() } }
+      ]   
+    }
+    console.log(filter)
     let quantumPortalTransactions = await db.QuantumPortalTransactions.find(filter)
       .sort({ createdAt: -1 })
       .skip(req.query.offset ? parseInt(req.query.offset) : 0)
@@ -31,7 +46,8 @@ module.exports = function (router: any) {
   router.post('/', asyncMiddleware(async (req: any, res: any) => {
 
     var filter: any = {}
-
+    req.body.createdAt = new Date();
+    req.body.updatedAt = new Date();
     let quantumPortalTransaction = await db.QuantumPortalTransactions.create(req.body);
 
     return res.http200({
